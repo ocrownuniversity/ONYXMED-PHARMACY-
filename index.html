@@ -752,6 +752,9 @@ firebase.initializeApp(FB);
 const db   = firebase.firestore();
 const auth = firebase.auth();
 
+// Enable offline persistence (caches data locally so app works on flaky connections)
+db.enablePersistence({ synchronizeTabs: false }).catch(e => console.warn('Persistence:', e.code));
+
 // ── SINGLE STORE ID (fixed for this pharmacy) ────
 const STORE_ID = 'onxy-main';
 
@@ -796,10 +799,12 @@ applyDark();
 
 // ── INIT ──────────────────────────────────────────
 async function initApp(){
-  try {
-    const doc = await db.collection('store').doc(STORE_ID).get();
-    if(doc.exists){ const d=doc.data(); CFG={bizName:d.name||'Onxy Pharmacy',currency:d.currency||'₦',threshold:d.threshold||10,address:d.address||''}; }
-  } catch(e){ console.warn('Config load:',e.message); }
+  // Use a timeout so the loading screen never hangs on slow/offline connections
+  const timeout = new Promise(res => setTimeout(res, 4000));
+  const fetchCfg = db.collection('store').doc(STORE_ID).get()
+    .then(doc => { if(doc.exists){ const d=doc.data(); CFG={bizName:d.name||'Onxy Pharmacy',currency:d.currency||'₦',threshold:d.threshold||10,address:d.address||''}; } })
+    .catch(e => console.warn('Config load (offline?):', e.message));
+  await Promise.race([fetchCfg, timeout]);
   g('loading').classList.add('h');
   show('lock-screen');
 }
@@ -813,8 +818,13 @@ async function doLogin(){
   g('login-btn').innerHTML='<div style="width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></div>';
   g('login-btn').disabled=true;
   try {
-    // Check store admin
-    const storeDoc = await db.collection('store').doc(STORE_ID).get();
+    let storeDoc;
+    try {
+      storeDoc = await db.collection('store').doc(STORE_ID).get();
+    } catch(e) {
+      // Offline or network error
+      throw new Error('Cannot connect to server. Check your internet and try again.');
+    }
     if(storeDoc.exists){
       const sd=storeDoc.data();
       if(sd.adminEmail===email && sd.adminPassword===pass){
@@ -823,7 +833,7 @@ async function doLogin(){
         show('app'); setupApp(); return;
       }
     } else {
-      // First run — seed the store
+      // First run — seed the store with these credentials
       await db.collection('store').doc(STORE_ID).set({
         name:'Onxy Pharmacy',currency:'₦',threshold:10,address:'',
         adminEmail:email,adminPassword:pass,adminName:'Admin'
@@ -832,7 +842,12 @@ async function doLogin(){
       show('app'); setupApp(); return;
     }
     // Check staff
-    const staffSnap = await db.collection('store').doc(STORE_ID).collection('staff').where('email','==',email).get();
+    let staffSnap;
+    try {
+      staffSnap = await db.collection('store').doc(STORE_ID).collection('staff').where('email','==',email).get();
+    } catch(e) {
+      throw new Error('Cannot connect to server. Check your internet and try again.');
+    }
     if(!staffSnap.empty){
       const su=staffSnap.docs[0].data();
       if(su.password===pass){ ME={id:staffSnap.docs[0].id,name:su.name,role:su.role,email}; show('app'); setupApp(); return; }
