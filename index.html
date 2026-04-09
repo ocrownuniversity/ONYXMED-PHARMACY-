@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Onxy Pharmacy — StockPilot PRO</title>
+<title>ONYX-MED PHARMACY — StockPilot PRO</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -361,37 +361,79 @@ textarea.fc{resize:vertical;min-height:70px}
 <div class="loading-screen" id="loading">
   <div style="font-size:2rem">💊</div>
   <div class="spin"></div>
-  <p>Connecting to Onxy Pharmacy…</p>
+  <p>Connecting to ONYX-MED PHARMACY…</p>
 </div>
 
 <!-- LOGIN -->
 <div class="screen screen-bg h" id="lock-screen">
   <div class="lcard">
-    <div class="llogo"><div class="llogo-icon">💊</div><div class="llogo-text">Onxy<span>Pharmacy</span></div></div>
-    <div class="ltitle">Welcome back</div>
-    <div class="lsub">Enter your PIN to continue</div>
-    <div id="login-err" class="errbox h"></div>
-    <div style="display:flex;justify-content:center;gap:14px;margin:18px 0 10px">
-      <div id="pd0" style="width:16px;height:16px;border-radius:50%;background:#E5E7EB;transition:background .15s"></div>
-      <div id="pd1" style="width:16px;height:16px;border-radius:50%;background:#E5E7EB;transition:background .15s"></div>
-      <div id="pd2" style="width:16px;height:16px;border-radius:50%;background:#E5E7EB;transition:background .15s"></div>
-      <div id="pd3" style="width:16px;height:16px;border-radius:50%;background:#E5E7EB;transition:background .15s"></div>
+    <div class="llogo"><div class="llogo-icon">💊</div><div class="llogo-text">ONYX-MED<span>PHARMACY</span></div></div>
+
+    <!-- STEP 1: Select role -->
+    <div id="login-step1">
+      <div class="ltitle" style="margin-bottom:6px">Welcome</div>
+      <div class="lsub" style="margin-bottom:20px">Who is signing in?</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <button onclick="selectRole('admin')" style="padding:20px 10px;border-radius:14px;border:2px solid #2563EB;background:#EFF6FF;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.background='#2563EB';this.style.color='#fff'" onmouseout="this.style.background='#EFF6FF';this.style.color=''">
+          <span style="font-size:2rem">👑</span>
+          <span style="font-weight:700;font-size:.9rem">Admin</span>
+        </button>
+        <button onclick="selectRole('staff')" style="padding:20px 10px;border-radius:14px;border:2px solid #10B981;background:#F0FDF4;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .2s" onmouseover="this.style.background='#10B981';this.style.color='#fff'" onmouseout="this.style.background='#F0FDF4';this.style.color=''">
+          <span style="font-size:2rem">👤</span>
+          <span style="font-weight:700;font-size:.9rem">Staff</span>
+        </button>
+      </div>
+      <div class="lfoot"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10B981;margin-right:5px"></span>ONYX-MED PHARMACY · Secured</div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
-      <button class="pin-btn" onclick="pinPress('1')">1</button>
-      <button class="pin-btn" onclick="pinPress('2')">2</button>
-      <button class="pin-btn" onclick="pinPress('3')">3</button>
-      <button class="pin-btn" onclick="pinPress('4')">4</button>
-      <button class="pin-btn" onclick="pinPress('5')">5</button>
-      <button class="pin-btn" onclick="pinPress('6')">6</button>
-      <button class="pin-btn" onclick="pinPress('7')">7</button>
-      <button class="pin-btn" onclick="pinPress('8')">8</button>
-      <button class="pin-btn" onclick="pinPress('9')">9</button>
-      <button class="pin-btn" onclick="pinClear()" style="font-size:.85rem;color:#6B7280">Clear</button>
-      <button class="pin-btn" onclick="pinPress('0')">0</button>
-      <button class="pin-btn" onclick="pinBack()" style="font-size:1.2rem">⌫</button>
+
+    <!-- STEP 2A: Admin PIN -->
+    <div id="login-step-admin" class="h">
+      <div class="ltitle" style="margin-bottom:2px">Admin Login</div>
+      <div class="lsub" style="margin-bottom:14px">Enter your 4-digit PIN</div>
+      <div id="login-err" class="errbox h" style="margin-bottom:10px"></div>
+      <div style="display:flex;justify-content:center;gap:14px;margin:0 0 16px">
+        <div id="pd0" style="width:16px;height:16px;border-radius:50%;background:#E5E7EB;transition:background .15s"></div>
+        <div id="pd1" style="width:16px;height:16px;border-radius:50%;background:#E5E7EB;transition:background .15s"></div>
+        <div id="pd2" style="width:16px;height:16px;border-radius:50%;background:#E5E7EB;transition:background .15s"></div>
+        <div id="pd3" style="width:16px;height:16px;border-radius:50%;background:#E5E7EB;transition:background .15s"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">
+        <button class="pin-btn" onclick="pinPress('1')">1</button>
+        <button class="pin-btn" onclick="pinPress('2')">2</button>
+        <button class="pin-btn" onclick="pinPress('3')">3</button>
+        <button class="pin-btn" onclick="pinPress('4')">4</button>
+        <button class="pin-btn" onclick="pinPress('5')">5</button>
+        <button class="pin-btn" onclick="pinPress('6')">6</button>
+        <button class="pin-btn" onclick="pinPress('7')">7</button>
+        <button class="pin-btn" onclick="pinPress('8')">8</button>
+        <button class="pin-btn" onclick="pinPress('9')">9</button>
+        <button class="pin-btn" onclick="pinClear()" style="font-size:.8rem;color:#6B7280">Clear</button>
+        <button class="pin-btn" onclick="pinPress('0')">0</button>
+        <button class="pin-btn" onclick="pinBack()" style="font-size:1.1rem">⌫</button>
+      </div>
+      <button onclick="backToRoleSelect()" style="width:100%;padding:9px;border:none;background:none;color:#6B7280;font-size:.83rem;cursor:pointer">← Back</button>
     </div>
-    <div class="lfoot"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10B981;margin-right:5px"></span>Secured · Single User</div>
+
+    <!-- STEP 2B: Staff Login -->
+    <div id="login-step-staff" class="h">
+      <div class="ltitle" style="margin-bottom:2px">Staff Login</div>
+      <div class="lsub" style="margin-bottom:14px">Enter your name and PIN</div>
+      <div id="staff-login-err" class="errbox h" style="margin-bottom:10px"></div>
+      <div class="fg" style="margin-bottom:11px">
+        <label class="fl">Your Name</label>
+        <input class="fi" id="sl-name" placeholder="e.g. Jane Smith" style="width:100%"/>
+      </div>
+      <div class="fg" style="margin-bottom:11px">
+        <label class="fl">Staff PIN (4 digits)</label>
+        <div class="pw-w">
+          <input class="fi" id="sl-pin" type="password" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" style="width:100%;letter-spacing:8px;font-size:1.3rem"/>
+          <span class="pw-eye" onclick="tpw('sl-pin')">👁</span>
+        </div>
+      </div>
+      <button class="btn-pri" onclick="doStaffLogin()" style="margin-bottom:10px">Sign In →</button>
+      <button onclick="backToRoleSelect()" style="width:100%;padding:9px;border:none;background:none;color:#6B7280;font-size:.83rem;cursor:pointer">← Back</button>
+    </div>
+
   </div>
 </div>
 
@@ -401,7 +443,7 @@ textarea.fc{resize:vertical;min-height:70px}
 
 <aside class="sb" id="sidebar">
   <div class="sb-head">
-    <div class="sb-brand"><div class="sb-icon">💊</div><div class="sb-name">Onxy<span>Rx</span></div></div>
+    <div class="sb-brand"><div class="sb-icon">💊</div><div class="sb-name">ONYX<span>MED</span></div></div>
     <button class="sb-x" onclick="closeSB()">✕</button>
   </div>
   <nav class="sb-nav">
@@ -553,7 +595,7 @@ textarea.fc{resize:vertical;min-height:70px}
       <div class="pg-head"><div><h2>Settings</h2></div></div>
       <div class="set-grid">
         <div class="card"><div class="card-head"><h3>🏢 Business</h3></div><div class="card-body">
-          <div class="fg2"><label class="fl">Pharmacy Name</label><input class="fc" id="set-biz" placeholder="Onxy Pharmacy"/></div>
+          <div class="fg2"><label class="fl">Pharmacy Name</label><input class="fc" id="set-biz" placeholder="ONYX-MED PHARMACY"/></div>
           <div class="fg2"><label class="fl">Currency</label><input class="fc" id="set-cur" placeholder="$" maxlength="3" style="width:70px"/></div>
           <div class="fg2"><label class="fl">Low Stock Threshold</label><input class="fc" type="number" id="set-thr" placeholder="10" style="width:110px"/></div>
           <div class="fg2"><label class="fl">Store Address</label><input class="fc" id="set-addr" placeholder="Address for receipts"/></div>
@@ -652,15 +694,17 @@ textarea.fc{resize:vertical;min-height:70px}
     <div id="stm-err" class="ferr h"></div>
     <input type="hidden" id="stm-id"/>
     <div class="fg2"><label class="fl">Full Name *</label><input class="fc" id="stm-name" placeholder="Jane Smith"/></div>
-    <div class="fg2"><label class="fl">Email *</label><input class="fc" type="email" id="stm-email" placeholder="jane@onxy.com"/></div>
     <div class="fg2"><label class="fl">Role</label>
       <select class="fc" id="stm-role">
-        <option value="admin">👑 Admin (Full Control)</option>
         <option value="pharmacist">💊 Pharmacist</option>
         <option value="cashier">👤 Cashier (Sales Only)</option>
+        <option value="admin">👑 Admin (Full Control)</option>
       </select>
     </div>
-    <div class="fg2"><label class="fl">Password *</label><input class="fc" type="password" id="stm-pass" placeholder="Min 6 chars"/></div>
+    <div class="fg2"><label class="fl">4-Digit PIN *</label>
+      <input class="fc" id="stm-pin" type="password" placeholder="e.g. 2345" maxlength="4" inputmode="numeric" pattern="[0-9]*"/>
+      <div style="font-size:.72rem;color:var(--t3);margin-top:3px">Staff uses their name + this PIN to log in</div>
+    </div>
     <div class="fg2"><label class="fl">Phone</label><input class="fc" id="stm-phone" placeholder="+234 800 000 0000"/></div>
   </div>
   <div class="mf"><button class="btn btn-o" onclick="closeM('staff-modal')">Cancel</button><button class="btn btn-b" onclick="saveStaff()">Save</button></div>
@@ -844,7 +888,7 @@ textarea.fc{resize:vertical;min-height:70px}
 //  ONXY PHARMACY — Single-User StockPilot PRO
 // ══════════════════════════════════════════════════
 
-// ── FIREBASE CONFIG (Onxy Pharmacy) ───────────────
+// ── FIREBASE CONFIG (ONYX-MED PHARMACY) ───────────────
 const FB = {
   apiKey: "AIzaSyA4U7R2EtEhWRXsLhFCrrbOM1FJ_tui3iM",
   authDomain: "onxy-pharmacy.firebaseapp.com",
@@ -877,7 +921,7 @@ let DARK    = localStorage.getItem('sp_dark')==='1';
 let CURRENT_CUST_ID = null;  // customer being viewed
 let VITALS_CACHE = {};       // { custId: [vitals] }
 let VS_BP_CHART = null, VS_BS_CHART = null;
-let CFG = { bizName:'Onxy Pharmacy', currency:'₦', threshold:10, address:'' };
+let CFG = { bizName:'ONYX-MED PHARMACY', currency:'₦', threshold:10, address:'' };
 
 const EMOJI = {Medicine:'💊',Supplements:'💪',Hygiene:'🧴',Dairy:'🥛',Bakery:'🍞',Beverages:'🥤',Snacks:'🍿',Household:'🏠',Electronics:'⚡',Clothing:'👕',Cosmetics:'💄',General:'📦'};
 const COLORS = ['#2563EB','#7C3AED','#059669','#DC2626','#D97706','#0891B2','#EC4899'];
@@ -907,7 +951,7 @@ async function initApp(){
   // Use a timeout so the loading screen never hangs on slow/offline connections
   const timeout = new Promise(res => setTimeout(res, 4000));
   const fetchCfg = db.collection('store').doc(STORE_ID).get()
-    .then(doc => { if(doc.exists){ const d=doc.data(); CFG={bizName:d.name||'Onxy Pharmacy',currency:d.currency||'₦',threshold:d.threshold||10,address:d.address||''}; } })
+    .then(doc => { if(doc.exists){ const d=doc.data(); CFG={bizName:d.name||'ONYX-MED PHARMACY',currency:d.currency||'₦',threshold:d.threshold||10,address:d.address||''}; } })
     .catch(e => console.warn('Config load (offline?):', e.message));
   await Promise.race([fetchCfg, timeout]);
   g('loading').classList.add('h');
@@ -915,15 +959,40 @@ async function initApp(){
 }
 initApp();
 
-// ── PIN LOGIN ─────────────────────────────────────
-const CORRECT_PIN = '1990';
+// ── LOGIN FLOW ─────────────────────────────────────
+const ADMIN_PIN = '1990';
 let pinEntry = '';
+let currentLoginRole = '';
+
+function selectRole(role){
+  currentLoginRole = role;
+  g('login-step1').classList.add('h');
+  if(role === 'admin'){
+    g('login-step-admin').classList.remove('h');
+    g('login-step-staff').classList.add('h');
+    pinClear();
+  } else {
+    g('login-step-staff').classList.remove('h');
+    g('login-step-admin').classList.add('h');
+    g('sl-name').value=''; g('sl-pin').value='';
+    g('staff-login-err').classList.add('h');
+    setTimeout(()=>g('sl-name').focus(),100);
+  }
+}
+
+function backToRoleSelect(){
+  g('login-step1').classList.remove('h');
+  g('login-step-admin').classList.add('h');
+  g('login-step-staff').classList.add('h');
+  g('login-err').classList.add('h');
+  pinClear();
+}
 
 function pinPress(d){
   if(pinEntry.length >= 4) return;
   pinEntry += d;
   updatePinDots();
-  if(pinEntry.length === 4) setTimeout(checkPin, 150);
+  if(pinEntry.length === 4) setTimeout(checkAdminPin, 150);
 }
 function pinBack(){
   pinEntry = pinEntry.slice(0,-1);
@@ -933,7 +1002,7 @@ function pinBack(){
 function pinClear(){
   pinEntry = '';
   updatePinDots();
-  g('login-err').classList.add('h');
+  const e=g('login-err'); if(e) e.classList.add('h');
 }
 function updatePinDots(){
   for(let i=0;i<4;i++){
@@ -941,24 +1010,55 @@ function updatePinDots(){
     if(d) d.style.background = i < pinEntry.length ? '#2563EB' : '#E5E7EB';
   }
 }
-function checkPin(){
-  if(pinEntry === CORRECT_PIN){
-    ME={id:'admin',name:'Admin',role:'admin',email:'admin@onxypharmacy.com'};
+function checkAdminPin(){
+  if(pinEntry === ADMIN_PIN){
+    ME={id:'admin',name:'Admin',role:'admin',email:'admin@onyxmedpharmacy.com'};
     show('app'); setupApp();
   } else {
     ferr('login-err','Wrong PIN. Try again.');
-    // shake animation
     const dots = document.querySelectorAll('[id^="pd"]');
     dots.forEach(d=>{ d.style.background='#EF4444'; });
     setTimeout(()=>{ pinClear(); },600);
   }
 }
-// also allow keyboard PIN entry
+
+async function doStaffLogin(){
+  const name = g('sl-name').value.trim();
+  const pin = g('sl-pin').value.trim();
+  if(!name) return ferr('staff-login-err','Enter your name.');
+  if(!pin || pin.length < 4) return ferr('staff-login-err','Enter your 4-digit PIN.');
+  // Search staff by name (case-insensitive) and pin
+  try {
+    const snap = await db.collection('store').doc(STORE_ID).collection('staff').get();
+    const match = snap.docs.find(d=>{
+      const s=d.data();
+      return s.name.toLowerCase()===name.toLowerCase() && s.pin===pin;
+    });
+    if(match){
+      const s=match.data();
+      ME={id:match.id, name:s.name, role:s.role||'staff', email:''};
+      show('app'); setupApp();
+    } else {
+      ferr('staff-login-err','Name or PIN incorrect.');
+      g('sl-pin').value='';
+    }
+  } catch(e){
+    ferr('staff-login-err','Cannot connect. Check internet.');
+  }
+}
+
+// Keyboard support for admin PIN
 document.addEventListener('keydown', e=>{
-  if(!g('lock-screen').classList.contains('h')) return;
-  if(e.key>='0'&&e.key<='9') pinPress(e.key);
-  if(e.key==='Backspace') pinBack();
-  if(e.key==='Escape') pinClear();
+  if(g('lock-screen').classList.contains('h')) return;
+  if(!g('login-step-admin').classList.contains('h')){
+    if(e.key>='0'&&e.key<='9') pinPress(e.key);
+    if(e.key==='Backspace') pinBack();
+    if(e.key==='Escape') backToRoleSelect();
+  }
+  if(!g('login-step-staff').classList.contains('h')){
+    if(e.key==='Enter') doStaffLogin();
+    if(e.key==='Escape') backToRoleSelect();
+  }
 });
 
 // ── SETUP APP ─────────────────────────────────────
@@ -1601,27 +1701,35 @@ async function markAllRead(){ const b=db.batch(); NOTIFS.filter(n=>!n.read).forE
 // ── STAFF ─────────────────────────────────────────
 function renderStaff(){
   const avColors=['#2563EB','#7C3AED','#059669','#DC2626','#D97706'];
-  g('staff-list').innerHTML=STAFF.length?STAFF.map((s,i)=>`<div class="stc"><div class="st-av" style="background:${avColors[i%avColors.length]}">${(s.name||'?').charAt(0).toUpperCase()}</div><div><div class="st-name">${esc(s.name)}</div><div class="st-email">${esc(s.email||'')}</div><span class="bdg bdg-b">${esc(s.role)}</span><div style="margin-top:8px;display:flex;gap:5px"><button class="btn btn-o btn-sm" onclick="openStaffModal('${s.id}')">✏️ Edit</button><button class="btn btn-r btn-sm" onclick="deleteStaff('${s.id}','${esc(s.name)}')">🗑</button></div></div></div>`).join('')
+  g('staff-list').innerHTML=STAFF.length?STAFF.map((s,i)=>`<div class="stc"><div class="st-av" style="background:${avColors[i%avColors.length]}">${(s.name||'?').charAt(0).toUpperCase()}</div><div><div class="st-name">${esc(s.name)}</div><div class="st-email">📞 ${esc(s.phone||'—')} · PIN: ****</div><span class="bdg bdg-b">${esc(s.role)}</span><div style="margin-top:8px;display:flex;gap:5px"><button class="btn btn-o btn-sm" onclick="openStaffModal('${s.id}')">✏️ Edit</button><button class="btn btn-r btn-sm" onclick="deleteStaff('${s.id}','${esc(s.name)}')">🗑</button></div></div></div>`).join('')
   :'<div class="empty" style="grid-column:1/-1"><div class="empty-icon">👤</div><div class="empty-title">No staff yet</div><div class="empty-sub">Add staff members for team access</div></div>';
 }
 
 function openStaffModal(id){
   g('stm-err').classList.add('h');
-  if(id){ const s=STAFF.find(x=>x.id===id); if(!s) return; g('stm-t').textContent='Edit Staff'; g('stm-id').value=id; g('stm-name').value=s.name||''; g('stm-email').value=s.email||''; g('stm-role').value=s.role||'cashier'; g('stm-pass').value=''; g('stm-phone').value=s.phone||''; }
-  else { g('stm-t').textContent='Add Staff'; g('stm-id').value=''; ['stm-name','stm-email','stm-pass','stm-phone'].forEach(f=>g(f).value=''); g('stm-role').value='cashier'; }
+  if(id){
+    const s=STAFF.find(x=>x.id===id); if(!s) return;
+    g('stm-t').textContent='Edit Staff'; g('stm-id').value=id;
+    g('stm-name').value=s.name||''; g('stm-role').value=s.role||'pharmacist';
+    g('stm-pin').value=''; g('stm-phone').value=s.phone||'';
+  } else {
+    g('stm-t').textContent='Add Staff'; g('stm-id').value='';
+    ['stm-name','stm-pin','stm-phone'].forEach(f=>g(f).value='');
+    g('stm-role').value='pharmacist';
+  }
   openM('staff-modal');
 }
 
 async function saveStaff(){
-  const name=g('stm-name').value.trim(), email=g('stm-email').value.trim().toLowerCase(), pass=g('stm-pass').value, role=g('stm-role').value, phone=g('stm-phone').value.trim(), eid=g('stm-id').value;
+  const name=g('stm-name').value.trim(), pin=g('stm-pin').value.trim(), role=g('stm-role').value, phone=g('stm-phone').value.trim(), eid=g('stm-id').value;
   if(!name) return ferr('stm-err','Name required.');
-  if(!email) return ferr('stm-err','Email required.');
-  if(!eid && (!pass||pass.length<6)) return ferr('stm-err','Password min 6 chars.');
-  const data={name,email,role,phone}; if(pass) data.password=pass;
+  if(!eid && (!pin||pin.length!==4||!/^\d+$/.test(pin))) return ferr('stm-err','Enter a 4-digit PIN.');
+  const data={name,role,phone};
+  if(pin) data.pin=pin;
   try{
     const col=db.collection('store').doc(STORE_ID).collection('staff');
     if(eid){ await col.doc(eid).update(data); toast('Staff updated!','s'); }
-    else{ await col.add(data); toast('Staff added!','s'); }
+    else{ await col.add(data); toast('Staff added! They can now login with name + PIN.','s'); }
     closeM('staff-modal');
   }catch(e){ ferr('stm-err','Save failed: '+e.message); }
 }
@@ -1630,7 +1738,7 @@ async function deleteStaff(id,name){ if(!confirm('Remove "'+name+'"?')) return; 
 
 // ── SETTINGS ──────────────────────────────────────
 async function saveSettings(){
-  CFG.bizName=g('set-biz').value.trim()||'Onxy Pharmacy';
+  CFG.bizName=g('set-biz').value.trim()||'ONYX-MED PHARMACY';
   CFG.currency=g('set-cur').value.trim()||'₦';
   CFG.threshold=parseInt(g('set-thr').value)||10;
   CFG.address=g('set-addr').value.trim();
@@ -1701,7 +1809,7 @@ document.addEventListener('keydown',e=>{
   // PIN login handled by its own keydown listener
 });
 
-console.log('%c Onxy Pharmacy — StockPilot PRO ✓','background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff;padding:5px 12px;border-radius:5px;font-weight:700');
+console.log('%c ONYX-MED PHARMACY — StockPilot PRO ✓','background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff;padding:5px 12px;border-radius:5px;font-weight:700');
 </script>
 </body>
 </html>
