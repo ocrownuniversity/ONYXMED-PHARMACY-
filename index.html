@@ -50,6 +50,8 @@ input,select,textarea{font-family:'Inter',sans-serif}
 .btn-ghost{width:100%;padding:11px;border:1.5px solid #E5E7EB;border-radius:var(--r2);font-size:.87rem;font-weight:600;color:#374151;background:transparent;cursor:pointer;margin-top:10px;transition:all .2s}
 .btn-ghost:hover{background:#F9FAFB}
 .lfoot{text-align:center;margin-top:16px;font-size:.77rem;color:#9CA3AF}
+.pin-btn{background:#F3F4F6;border:1.5px solid #E5E7EB;border-radius:12px;padding:16px;font-size:1.3rem;font-weight:700;color:#111827;cursor:pointer;transition:all .15s;width:100%}
+.pin-btn:active{background:#DBEAFE;border-color:#2563EB;transform:scale(.94)}
 .loading-screen{position:fixed;inset:0;background:#0F1F45;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:16px}
 .loading-screen .spin{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);border-top-color:#2563EB;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -345,12 +347,29 @@ textarea.fc{resize:vertical;min-height:70px}
   <div class="lcard">
     <div class="llogo"><div class="llogo-icon">💊</div><div class="llogo-text">Onxy<span>Pharmacy</span></div></div>
     <div class="ltitle">Welcome back</div>
-    <div class="lsub">Sign in to your pharmacy system</div>
+    <div class="lsub">Enter your PIN to continue</div>
     <div id="login-err" class="errbox h"></div>
-    <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="l-email" placeholder="admin@onxypharmacy.com"/></div>
-    <div class="fg"><label class="fl">Password</label><div class="pw-w"><input class="fi" type="password" id="l-pass" placeholder="Password"/><span class="pw-eye" onclick="tpw('l-pass')">👁</span></div></div>
-    <button class="btn-pri" id="login-btn" onclick="doLogin()">Sign In →</button>
-    <div class="lfoot"><span class="pdot"></span>Firebase Sync · Secured · Single User</div>
+    <div style="display:flex;justify-content:center;gap:14px;margin:18px 0 10px">
+      <div id="pd0" style="width:16px;height:16px;border-radius:50%;background:#E5E7EB;transition:background .15s"></div>
+      <div id="pd1" style="width:16px;height:16px;border-radius:50%;background:#E5E7EB;transition:background .15s"></div>
+      <div id="pd2" style="width:16px;height:16px;border-radius:50%;background:#E5E7EB;transition:background .15s"></div>
+      <div id="pd3" style="width:16px;height:16px;border-radius:50%;background:#E5E7EB;transition:background .15s"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+      <button class="pin-btn" onclick="pinPress('1')">1</button>
+      <button class="pin-btn" onclick="pinPress('2')">2</button>
+      <button class="pin-btn" onclick="pinPress('3')">3</button>
+      <button class="pin-btn" onclick="pinPress('4')">4</button>
+      <button class="pin-btn" onclick="pinPress('5')">5</button>
+      <button class="pin-btn" onclick="pinPress('6')">6</button>
+      <button class="pin-btn" onclick="pinPress('7')">7</button>
+      <button class="pin-btn" onclick="pinPress('8')">8</button>
+      <button class="pin-btn" onclick="pinPress('9')">9</button>
+      <button class="pin-btn" onclick="pinClear()" style="font-size:.85rem;color:#6B7280">Clear</button>
+      <button class="pin-btn" onclick="pinPress('0')">0</button>
+      <button class="pin-btn" onclick="pinBack()" style="font-size:1.2rem">⌫</button>
+    </div>
+    <div class="lfoot"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10B981;margin-right:5px"></span>Secured · Single User</div>
   </div>
 </div>
 
@@ -810,57 +829,51 @@ async function initApp(){
 }
 initApp();
 
-// ── LOGIN ─────────────────────────────────────────
-async function doLogin(){
-  const email = g('l-email').value.trim().toLowerCase();
-  const pass  = g('l-pass').value;
-  if(!email||!pass) return ferr('login-err','Fill in all fields.');
-  g('login-btn').innerHTML='<div style="width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></div>';
-  g('login-btn').disabled=true;
-  try {
-    let storeDoc;
-    try {
-      storeDoc = await db.collection('store').doc(STORE_ID).get();
-    } catch(e) {
-      // Offline or network error
-      throw new Error('Cannot connect to server. Check your internet and try again.');
-    }
-    if(storeDoc.exists){
-      const sd=storeDoc.data();
-      if(sd.adminEmail===email && sd.adminPassword===pass){
-        ME={id:'admin',name:sd.adminName||'Admin',role:'admin',email};
-        CFG={bizName:sd.name||'Onxy Pharmacy',currency:sd.currency||'₦',threshold:sd.threshold||10,address:sd.address||''};
-        show('app'); setupApp(); return;
-      }
-    } else {
-      // First run — seed the store with these credentials
-      await db.collection('store').doc(STORE_ID).set({
-        name:'Onxy Pharmacy',currency:'₦',threshold:10,address:'',
-        adminEmail:email,adminPassword:pass,adminName:'Admin'
-      });
-      ME={id:'admin',name:'Admin',role:'admin',email};
-      show('app'); setupApp(); return;
-    }
-    // Check staff
-    let staffSnap;
-    try {
-      staffSnap = await db.collection('store').doc(STORE_ID).collection('staff').where('email','==',email).get();
-    } catch(e) {
-      throw new Error('Cannot connect to server. Check your internet and try again.');
-    }
-    if(!staffSnap.empty){
-      const su=staffSnap.docs[0].data();
-      if(su.password===pass){ ME={id:staffSnap.docs[0].id,name:su.name,role:su.role,email}; show('app'); setupApp(); return; }
-      else throw new Error('Wrong password');
-    }
-    throw new Error('Invalid email or password');
-  } catch(e){
-    ferr('login-err',e.message||'Login failed.');
-  } finally {
-    g('login-btn').innerHTML='Sign In →';
-    g('login-btn').disabled=false;
+// ── PIN LOGIN ─────────────────────────────────────
+const CORRECT_PIN = '1990';
+let pinEntry = '';
+
+function pinPress(d){
+  if(pinEntry.length >= 4) return;
+  pinEntry += d;
+  updatePinDots();
+  if(pinEntry.length === 4) setTimeout(checkPin, 150);
+}
+function pinBack(){
+  pinEntry = pinEntry.slice(0,-1);
+  updatePinDots();
+  g('login-err').classList.add('h');
+}
+function pinClear(){
+  pinEntry = '';
+  updatePinDots();
+  g('login-err').classList.add('h');
+}
+function updatePinDots(){
+  for(let i=0;i<4;i++){
+    const d=g('pd'+i);
+    if(d) d.style.background = i < pinEntry.length ? '#2563EB' : '#E5E7EB';
   }
 }
+function checkPin(){
+  if(pinEntry === CORRECT_PIN){
+    ME={id:'admin',name:'Admin',role:'admin',email:'admin@onxypharmacy.com'};
+    show('app'); setupApp();
+  } else {
+    ferr('login-err','Wrong PIN. Try again.');
+    // shake animation
+    const dots = document.querySelectorAll('[id^="pd"]');
+    dots.forEach(d=>{ d.style.background='#EF4444'; });
+    setTimeout(()=>{ pinClear(); },600);
+  }
+}
+// also allow keyboard PIN entry
+document.addEventListener('keydown', e=>{
+  if(!g('lock-screen').classList.contains('h')) return;
+  if(e.key>='0'&&e.key<='9') pinPress(e.key);
+  if(e.key==='Backspace') pinBack();
+  if(e.key==='Escape') pinClear();
+});
 
 // ── SETUP APP ─────────────────────────────────────
 function setupApp(){
@@ -935,7 +948,7 @@ function closeSB(){ g('sidebar').classList.remove('open'); g('sb-ovl').classList
 function logout(){
   UNSUBS.forEach(fn=>fn&&fn()); UNSUBS=[];
   ME=null; PRODS=[]; SALES=[]; NOTIFS=[]; STAFF=[]; CUSTS=[];
-  g('l-email').value=''; g('l-pass').value='';
+  pinClear();
   g('login-err').classList.add('h');
   show('lock-screen');
 }
@@ -1506,7 +1519,7 @@ adjGrids();
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){['prod-modal','sale-modal','del-modal','stock-modal','staff-modal','rcpt-modal','cust-modal','cust-detail-modal','vital-modal'].forEach(closeM);}
   const appVis=!g('app').classList.contains('h');
-  if(appVis&&e.key==='Enter'&&document.activeElement?.id==='l-pass') doLogin();
+  // PIN login handled by its own keydown listener
 });
 
 console.log('%c Onxy Pharmacy — StockPilot PRO ✓','background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff;padding:5px 12px;border-radius:5px;font-weight:700');
