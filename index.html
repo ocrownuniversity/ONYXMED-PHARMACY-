@@ -291,6 +291,28 @@ tbody tr:hover{background:var(--bg)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .info-box{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:var(--r2);padding:10px 13px;font-size:.82rem;color:#7C3AED;margin-bottom:12px}
 .allergy-tag{display:inline-block;background:rgba(239,68,68,.1);color:#DC2626;border-radius:99px;padding:2px 9px;font-size:.75rem;font-weight:700;margin:2px}
+.pf-btn{background:#fff;border:1.5px solid #2563EB;color:#2563EB;border-radius:20px;padding:6px 13px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.pf-btn:hover,.pf-btn.on{background:#2563EB;color:#fff}
+.pf-info-cell{background:var(--surf);padding:11px 14px}
+.pf-info-cell .pf-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:3px}
+.pf-info-cell .pf-value{font-weight:700;font-size:.9rem;color:var(--navy)}
+.med-entry{background:var(--bg);border-radius:var(--r2);padding:10px 12px;margin-bottom:8px;border-left:3px solid #2563EB}
+.med-entry-meta{font-size:.71rem;color:var(--t3);margin-bottom:4px}
+.med-entry-text{font-size:.87rem;color:var(--t2);white-space:pre-wrap}
+.tl-item{display:flex;gap:12px;margin-bottom:14px;position:relative}
+.tl-dot{width:12px;height:12px;border-radius:50%;background:#2563EB;flex-shrink:0;margin-top:4px;position:relative;z-index:1}
+.tl-line{position:absolute;left:5px;top:16px;bottom:-14px;width:2px;background:var(--bord)}
+.tl-item:last-child .tl-line{display:none}
+.tl-body{flex:1}
+.tl-tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.68rem;font-weight:700;text-transform:uppercase;margin-bottom:4px}
+.tl-tag-vitals{background:#FEE2E2;color:#DC2626}
+.tl-tag-diagnosis{background:#DBEAFE;color:#1D4ED8}
+.tl-tag-prescription{background:#D1FAE5;color:#059669}
+.tl-tag-lab{background:#EDE9FE;color:#7C3AED}
+.tl-tag-labresult{background:#FEF3C7;color:#D97706}
+.tl-tag-notes{background:#F3F4F6;color:#374151}
+.tl-meta{font-size:.71rem;color:var(--t3);margin-bottom:2px}
+.tl-text{font-size:.84rem;color:var(--t2)}
 textarea.fc{resize:vertical;min-height:70px}
 .prog-w{height:5px;background:var(--bg);border-radius:99px;overflow:hidden;margin-top:4px}
 .prog-b{height:100%;border-radius:99px;transition:width .6s ease}
@@ -659,67 +681,130 @@ textarea.fc{resize:vertical;min-height:70px}
     <input type="hidden" id="cm-id"/>
     <div class="fr">
       <div class="fu fg2"><label class="fl">Full Name *</label><input class="fc" id="cm-name" placeholder="e.g. Fatima Bello"/></div>
-      <div class="fg2"><label class="fl">Customer ID</label><input class="fc" id="cm-cid" placeholder="Auto-generated" readonly style="background:var(--bg)"/></div>
+      <div class="fg2"><label class="fl">Patient ID</label><input class="fc" id="cm-cid" placeholder="Auto-generated" readonly style="background:var(--bg)"/></div>
+      <div class="fg2"><label class="fl">Gender</label>
+        <select class="fc" id="cm-gender">
+          <option value="">Select</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="fg2"><label class="fl">Date of Birth</label><input class="fc" type="date" id="cm-dob"/></div>
       <div class="fg2"><label class="fl">Phone / WhatsApp *</label><input class="fc" id="cm-phone" placeholder="+234 800 000 0000"/></div>
       <div class="fg2"><label class="fl">Email (optional)</label><input class="fc" type="email" id="cm-email" placeholder="fatima@email.com"/></div>
-      <div class="fg2"><label class="fl">Date of Birth</label><input class="fc" type="date" id="cm-dob"/></div>
+      <div class="fg2"><label class="fl">Emergency Contact</label><input class="fc" id="cm-emergency" placeholder="Phone number"/></div>
+      <div class="fg2"><label class="fl">Occupation (optional)</label><input class="fc" id="cm-occupation" placeholder="e.g. Teacher"/></div>
       <div class="fu fg2"><label class="fl">Address (optional)</label><input class="fc" id="cm-addr" placeholder="Street, City"/></div>
-      <div class="fu fg2"><label class="fl">Allergies / Medical Notes</label><textarea class="fc" id="cm-notes" placeholder="e.g. Penicillin allergy, Diabetic, hypertensive…" rows="3"></textarea></div>
+      <div class="fu fg2"><label class="fl">Medical History / Allergies</label><textarea class="fc" id="cm-notes" placeholder="e.g. Typhoid, Penicillin allergy, Diabetic…" rows="3"></textarea></div>
     </div>
   </div>
   <div class="mf"><button class="btn btn-o" onclick="closeM('cust-modal')">Cancel</button><button class="btn btn-b" id="cm-save" onclick="saveCust()">Add Customer</button></div>
 </div></div>
 
-<!-- Customer Detail Modal -->
-<div id="cust-detail-modal" class="mo h"><div class="mb mb-lg">
-  <div class="mh">
+<!-- Customer Detail Modal — Full Patient File -->
+<div id="cust-detail-modal" class="mo h"><div class="mb mb-lg" style="max-width:620px">
+  <div class="mh" style="background:linear-gradient(135deg,#0F1F45,#1E3A8A);border-radius:14px 14px 0 0">
     <div>
-      <h3 id="cdm-name">Customer Details</h3>
-      <div id="cdm-id" style="font-size:.72rem;color:var(--t4);font-family:'JetBrains Mono',monospace;margin-top:2px"></div>
+      <h3 id="cdm-name" style="color:#fff;font-size:1.1rem">Patient File</h3>
+      <div id="cdm-id" style="font-size:.71rem;color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace;margin-top:2px"></div>
     </div>
     <div style="display:flex;gap:6px;align-items:center">
-      <button class="btn btn-o btn-sm" id="cdm-edit-btn" onclick="editCurrentCust()">✏️ Edit</button>
-      <button class="mx" onclick="closeM('cust-detail-modal')">✕</button>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2)" onclick="editCurrentCust()">✏️ Edit</button>
+      <button class="mx" style="color:rgba(255,255,255,.6)" onclick="closeM('cust-detail-modal')">✕</button>
     </div>
   </div>
-  <div class="mbd" style="padding-top:12px">
-    <!-- Info strip -->
-    <div id="cdm-info" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px"></div>
-    <!-- Allergy box -->
-    <div id="cdm-allergy-box" class="info-box h">⚠️ <span id="cdm-allergy-text"></span></div>
-    <!-- Tabs -->
-    <div class="cust-detail-tabs">
-      <div class="cdt on" onclick="cdTab('history',this)">🛍️ Purchase History</div>
-      <div class="cdt" onclick="cdTab('vitals',this)">❤️ Vital Signs</div>
+  <div class="mbd" style="padding:0">
+    <!-- Patient Info Grid -->
+    <div id="cdm-info-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bord);border-bottom:1px solid var(--bord)"></div>
+    <!-- Emergency & Medical History -->
+    <div style="padding:12px 16px;border-bottom:1px solid var(--bord)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+        <div><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:2px">Emergency Contact</div><div style="font-weight:700;font-size:.9rem" id="cdm-emergency">—</div></div>
+        <div><div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:2px">Purchases</div><div style="font-weight:700;font-size:.9rem" id="cdm-purchases">0</div></div>
+      </div>
+      <div id="cdm-allergy-box" class="h" style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:9px 12px;font-size:.83rem;color:#DC2626;font-weight:600">
+        ⚠️ Medical History / Allergies: <span id="cdm-allergy-text"></span>
+      </div>
+    </div>
+    <!-- Action Buttons -->
+    <div style="padding:12px 16px;border-bottom:1px solid var(--bord);background:var(--bg)">
+      <div style="display:flex;flex-wrap:wrap;gap:7px">
+        <button class="pf-btn" onclick="cdTab('vitals',null);openVitalModal()">❤️ Vital Signs</button>
+        <button class="pf-btn" onclick="cdTab('diagnosis',null)">🩺 Diagnosis</button>
+        <button class="pf-btn" onclick="cdTab('prescription',null)">💊 Prescription</button>
+        <button class="pf-btn" onclick="cdTab('lab',null)">🔬 Lab Request</button>
+        <button class="pf-btn" onclick="cdTab('labresult',null)">📋 Lab Result</button>
+        <button class="pf-btn" onclick="cdTab('notes',null)">🩺 Note</button>
+        <button class="pf-btn" onclick="cdTab('history',null)">🛍️ Sales History</button>
+      </div>
+    </div>
+    <!-- Tab Content -->
+    <!-- Vitals Tab -->
+    <div id="cdt-vitals" class="h" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:.85rem;font-weight:700;color:var(--navy)">❤️ Vital Signs</div>
+        <button class="btn btn-p btn-sm" onclick="openVitalModal()">+ Add</button>
+      </div>
+      <div class="vs-grid" id="vs-latest-grid" style="margin-bottom:14px"></div>
+      <div class="card" style="margin-bottom:12px"><div class="card-head"><h3>BP Trend</h3></div><div class="card-body"><canvas id="vs-bp-chart" height="120"></canvas></div></div>
+      <div class="card" style="margin-bottom:12px"><div class="card-head"><h3>Blood Sugar Trend</h3></div><div class="card-body"><canvas id="vs-bs-chart" height="120"></canvas></div></div>
+      <div class="tw"><table><thead><tr><th>Date</th><th>Temp</th><th>BP</th><th>Sugar</th><th>Pulse</th><th>Weight/Ht</th><th>SpO2</th><th>Notes</th><th></th></tr></thead><tbody id="vs-tb"></tbody></table></div>
+    </div>
+    <!-- Diagnosis Tab -->
+    <div id="cdt-diagnosis" class="h" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:.85rem;font-weight:700;color:var(--navy)">🩺 Diagnosis</div>
+        <button class="btn btn-b btn-sm" onclick="saveMedEntry('diagnosis')">+ Save Entry</button>
+      </div>
+      <textarea class="fc" id="diag-input" placeholder="Enter diagnosis…" rows="4" style="margin-bottom:10px"></textarea>
+      <div id="diag-list"></div>
+    </div>
+    <!-- Prescription Tab -->
+    <div id="cdt-prescription" class="h" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:.85rem;font-weight:700;color:var(--navy)">💊 Prescription</div>
+        <button class="btn btn-b btn-sm" onclick="saveMedEntry('prescription')">+ Save Entry</button>
+      </div>
+      <textarea class="fc" id="presc-input" placeholder="Enter prescription details…" rows="4" style="margin-bottom:10px"></textarea>
+      <div id="presc-list"></div>
+    </div>
+    <!-- Lab Request Tab -->
+    <div id="cdt-lab" class="h" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:.85rem;font-weight:700;color:var(--navy)">🔬 Lab Request</div>
+        <button class="btn btn-b btn-sm" onclick="saveMedEntry('lab')">+ Save Entry</button>
+      </div>
+      <textarea class="fc" id="lab-input" placeholder="e.g. Full Blood Count, Malaria Test…" rows="4" style="margin-bottom:10px"></textarea>
+      <div id="lab-list"></div>
+    </div>
+    <!-- Lab Result Tab -->
+    <div id="cdt-labresult" class="h" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:.85rem;font-weight:700;color:var(--navy)">📋 Lab Result</div>
+        <button class="btn btn-b btn-sm" onclick="saveMedEntry('labresult')">+ Save Entry</button>
+      </div>
+      <textarea class="fc" id="labresult-input" placeholder="Enter lab result details…" rows="4" style="margin-bottom:10px"></textarea>
+      <div id="labresult-list"></div>
+    </div>
+    <!-- Notes Tab -->
+    <div id="cdt-notes" class="h" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:.85rem;font-weight:700;color:var(--navy)">🩺 Clinical Notes</div>
+        <button class="btn btn-b btn-sm" onclick="saveMedEntry('notes')">+ Save Entry</button>
+      </div>
+      <textarea class="fc" id="notes-input" placeholder="General clinical notes…" rows="4" style="margin-bottom:10px"></textarea>
+      <div id="notes-list"></div>
     </div>
     <!-- History Tab -->
-    <div id="cdt-history">
+    <div id="cdt-history" class="h" style="padding:14px 16px">
+      <div style="font-size:.85rem;font-weight:700;color:var(--navy);margin-bottom:10px">🛍️ Purchase History</div>
       <div class="tw"><table><thead><tr><th>Date</th><th>Product</th><th>Qty</th><th>Total</th></tr></thead><tbody id="cdm-hist-tb"></tbody></table></div>
     </div>
-    <!-- Vitals Tab -->
-    <div id="cdt-vitals" class="h">
-      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-        <button class="btn btn-p btn-sm" onclick="openVitalModal()">+ Add Vital Signs</button>
-      </div>
-      <!-- Latest snapshot -->
-      <div class="vs-section">
-        <h4>Latest Reading</h4>
-        <div class="vs-grid" id="vs-latest-grid"></div>
-      </div>
-      <!-- History chart -->
-      <div class="card" style="margin-bottom:14px">
-        <div class="card-head"><h3>📊 Blood Pressure Trend</h3></div>
-        <div class="card-body"><canvas id="vs-bp-chart" height="140"></canvas></div>
-      </div>
-      <div class="card" style="margin-bottom:14px">
-        <div class="card-head"><h3>📊 Blood Sugar Trend</h3></div>
-        <div class="card-body"><canvas id="vs-bs-chart" height="140"></canvas></div>
-      </div>
-      <!-- Full table -->
-      <div class="card">
-        <div class="card-head"><h3>All Records</h3></div>
-        <div class="tw"><table><thead><tr><th>Date</th><th>Temp</th><th>BP</th><th>Sugar</th><th>Pulse</th><th>Weight</th><th>Other</th><th></th></tr></thead><tbody id="vs-tb"></tbody></table></div>
-      </div>
+    <!-- Medical Timeline -->
+    <div id="cdt-timeline" style="padding:14px 16px;border-top:1px solid var(--bord)">
+      <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#2563EB;margin-bottom:10px">📋 Medical Timeline</div>
+      <div id="medical-timeline"></div>
     </div>
   </div>
 </div></div>
@@ -738,6 +823,7 @@ textarea.fc{resize:vertical;min-height:70px}
       <div class="fg2"><label class="fl">Pulse / Heart Rate (bpm)</label><input class="fc" type="number" id="vm-pulse" placeholder="72" min="0"/></div>
       <div class="fg2"><label class="fl">Weight (kg)</label><input class="fc" type="number" id="vm-weight" placeholder="70.0" step="0.1" min="0"/></div>
       <div class="fg2"><label class="fl">Height (cm) — for BMI</label><input class="fc" type="number" id="vm-height" placeholder="170" min="0"/></div>
+      <div class="fg2"><label class="fl">SpO₂ / Oxygen (%)</label><input class="fc" type="number" id="vm-spo2" placeholder="98" min="0" max="100"/></div>
       <div class="fu fg2"><label class="fl">Other Lab Results / Notes</label><textarea class="fc" id="vm-other" placeholder="e.g. Cholesterol: 190 mg/dL, HbA1c: 5.7%" rows="2"></textarea></div>
     </div>
     <div id="vm-bmi-display" class="ibox h"></div>
@@ -1175,15 +1261,18 @@ function openCustModal(id){
   g('cm-err').classList.add('h');
   if(id){
     const c=CUSTS.find(x=>x.id===id); if(!c) return;
-    g('cm-t').textContent='Edit Customer'; g('cm-id').value=id;
+    g('cm-t').textContent='Edit Patient'; g('cm-id').value=id;
     g('cm-cid').value=c.customerId||''; g('cm-name').value=c.name||''; g('cm-phone').value=c.phone||'';
     g('cm-email').value=c.email||''; g('cm-dob').value=c.dob||''; g('cm-addr').value=c.address||'';
-    g('cm-notes').value=c.notes||''; g('cm-save').textContent='Save Changes';
+    g('cm-notes').value=c.notes||''; g('cm-gender').value=c.gender||'';
+    g('cm-emergency').value=c.emergency||''; g('cm-occupation').value=c.occupation||'';
+    g('cm-save').textContent='Save Changes';
   } else {
-    g('cm-t').textContent='Add Customer'; g('cm-id').value='';
+    g('cm-t').textContent='Add Patient'; g('cm-id').value='';
     const newId=genCustId(); g('cm-cid').value=newId;
-    ['cm-name','cm-phone','cm-email','cm-dob','cm-addr','cm-notes'].forEach(f=>g(f).value='');
-    g('cm-save').textContent='Add Customer';
+    ['cm-name','cm-phone','cm-email','cm-dob','cm-addr','cm-notes','cm-emergency','cm-occupation'].forEach(f=>g(f).value='');
+    g('cm-gender').value='';
+    g('cm-save').textContent='Add Patient';
   }
   openM('cust-modal');
 }
@@ -1192,11 +1281,21 @@ async function saveCust(){
   const name=g('cm-name').value.trim(), phone=g('cm-phone').value.trim(), eid=g('cm-id').value;
   if(!name) return ferr('cm-err','Full name required.');
   if(!phone) return ferr('cm-err','Phone is required.');
-  const data={name,phone,email:g('cm-email').value.trim(),dob:g('cm-dob').value,address:g('cm-addr').value.trim(),notes:g('cm-notes').value.trim(),customerId:g('cm-cid').value.trim()};
+  const data={
+    name,phone,
+    email:g('cm-email').value.trim(),
+    dob:g('cm-dob').value,
+    gender:g('cm-gender').value,
+    address:g('cm-addr').value.trim(),
+    notes:g('cm-notes').value.trim(),
+    emergency:g('cm-emergency').value.trim(),
+    occupation:g('cm-occupation').value.trim(),
+    customerId:g('cm-cid').value.trim()
+  };
   try{
     const col=db.collection('store').doc(STORE_ID).collection('customers');
-    if(eid){ await col.doc(eid).update(data); toast('Customer updated!','s'); }
-    else{ await col.add({...data,purchaseCount:0,totalSpent:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); toast('Customer added!','s'); }
+    if(eid){ await col.doc(eid).update(data); toast('Patient updated!','s'); }
+    else{ await col.add({...data,purchaseCount:0,totalSpent:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); toast('Patient added!','s'); }
     closeM('cust-modal');
   }catch(e){ ferr('cm-err','Save failed: '+e.message); }
 }
@@ -1213,40 +1312,118 @@ async function deleteCust(id,name){
 }
 
 // ── CUSTOMER DETAIL ───────────────────────────────
+const MED_TABS=['vitals','diagnosis','prescription','lab','labresult','notes','history'];
+
 async function openCustDetail(id){
   CURRENT_CUST_ID=id;
   const c=CUSTS.find(x=>x.id===id); if(!c) return;
+  // Header
   g('cdm-name').textContent=c.name;
-  g('cdm-id').textContent=(c.customerId||id.slice(-8))+' · DOB: '+(c.dob||'—')+' · Age: '+fmtAge(c.dob);
-  // info strip
-  g('cdm-info').innerHTML=`
-    <div style="background:var(--bg);border-radius:var(--r2);padding:10px;text-align:center"><div style="font-size:.65rem;text-transform:uppercase;color:var(--t3);letter-spacing:.4px;margin-bottom:2px">Phone</div><div style="font-weight:700;font-size:.86rem">📞 ${esc(c.phone)}</div></div>
-    <div style="background:var(--bg);border-radius:var(--r2);padding:10px;text-align:center"><div style="font-size:.65rem;text-transform:uppercase;color:var(--t3);letter-spacing:.4px;margin-bottom:2px">Purchases</div><div style="font-weight:700;font-size:.86rem">${c.purchaseCount||0}</div></div>
-    <div style="background:var(--bg);border-radius:var(--r2);padding:10px;text-align:center"><div style="font-size:.65rem;text-transform:uppercase;color:var(--t3);letter-spacing:.4px;margin-bottom:2px">Total Spent</div><div style="font-weight:700;font-size:.86rem">${fmt(c.totalSpent||0)}</div></div>
-  `;
+  g('cdm-id').textContent=(c.customerId||'—')+' · '+( c.dob ? fmtAge(c.dob)+' yrs' : 'Age N/A' )+' · '+(c.gender||'—');
+  // Info grid
+  const infoFields=[
+    {label:'Patient ID',value:c.customerId||'—'},
+    {label:'Full Name',value:c.name},
+    {label:'Age',value:c.dob ? fmtAge(c.dob)+' years' : '—'},
+    {label:'Gender',value:c.gender||'—'},
+    {label:'Phone',value:c.phone},
+    {label:'Address',value:c.address||'—'},
+  ];
+  g('cdm-info-grid').innerHTML=infoFields.map(f=>`<div class="pf-info-cell"><div class="pf-label">${f.label}</div><div class="pf-value">${esc(f.value)}</div></div>`).join('');
+  // Emergency & allergies
+  g('cdm-emergency').textContent=c.emergency||'—';
+  g('cdm-purchases').textContent=(c.purchaseCount||0)+' · '+fmt(c.totalSpent||0)+' spent';
   if(c.notes){ g('cdm-allergy-box').classList.remove('h'); g('cdm-allergy-text').textContent=c.notes; }
   else g('cdm-allergy-box').classList.add('h');
-  // purchase history
+  // Purchase history
   const custSales=SALES.filter(s=>s.customerId===id);
-  const htb=g('cdm-hist-tb');
-  htb.innerHTML=custSales.length?custSales.map(s=>`<tr><td style="color:var(--t4);font-size:.77rem">${fmtDT(s.timestamp)}</td><td class="td-n">${esc(s.productName)}</td><td class="td-m">${s.quantity}</td><td class="td-m td-gr">${fmt(s.total)}</td></tr>`).join('')
+  g('cdm-hist-tb').innerHTML=custSales.length?custSales.map(s=>`<tr><td style="color:var(--t4);font-size:.77rem">${fmtDT(s.timestamp)}</td><td class="td-n">${esc(s.productName)}</td><td class="td-m">${s.quantity}</td><td class="td-m td-gr">${fmt(s.total)}</td></tr>`).join('')
   :'<tr><td colspan="4" style="text-align:center;padding:22px;color:var(--t3)">No purchases yet</td></tr>';
-  // set tab to history
-  cdTab('history',null);
+  // Show vitals tab by default
+  cdTab('vitals',null);
   openM('cust-detail-modal');
-  // load vitals
   await loadVitals(id);
+  await loadMedEntries(id);
 }
 
 function editCurrentCust(){ closeM('cust-detail-modal'); openCustModal(CURRENT_CUST_ID); }
 
 function cdTab(tab, el){
-  document.querySelectorAll('.cdt').forEach(e=>e.classList.remove('on'));
+  MED_TABS.forEach(t=>{ const e=g('cdt-'+t); if(e) e.classList.add('h'); });
+  document.querySelectorAll('.pf-btn').forEach(b=>b.classList.remove('on'));
   if(el) el.classList.add('on');
-  else { const t=document.querySelector('.cdt'); if(t) t.classList.add('on'); }
-  g('cdt-history').classList.toggle('h',tab!=='history');
-  g('cdt-vitals').classList.toggle('h',tab!=='vitals');
+  const target=g('cdt-'+tab); if(target) target.classList.remove('h');
   if(tab==='vitals') renderVitals(CURRENT_CUST_ID);
+  if(['diagnosis','prescription','lab','labresult','notes'].includes(tab)) renderMedEntries(tab);
+}
+
+// ── MEDICAL ENTRIES (Diagnosis, Prescription, Lab, etc.) ──
+let MED_CACHE={};
+async function loadMedEntries(custId){
+  const types=['diagnosis','prescription','lab','labresult','notes'];
+  for(const t of types){
+    try{
+      const snap=await db.collection('store').doc(STORE_ID).collection('customers').doc(custId).collection(t).orderBy('date','desc').get();
+      if(!MED_CACHE[custId]) MED_CACHE[custId]={};
+      MED_CACHE[custId][t]=snap.docs.map(d=>({id:d.id,...d.data(),date:d.data().date?.toDate?.()|| new Date()}));
+    }catch(e){ if(!MED_CACHE[custId]) MED_CACHE[custId]={}; MED_CACHE[custId][t]=[]; }
+  }
+  renderTimeline(custId);
+}
+
+function renderMedEntries(type){
+  const entries=(MED_CACHE[CURRENT_CUST_ID]||{})[type]||[];
+  const listId={diagnosis:'diag-list',prescription:'presc-list',lab:'lab-list',labresult:'labresult-list',notes:'notes-list'}[type];
+  const el=g(listId); if(!el) return;
+  el.innerHTML=entries.length?entries.map(e=>`
+    <div class="med-entry">
+      <div class="med-entry-meta">🕐 ${fmtDT(e.date)} · ${esc(e.by||'Admin')}</div>
+      <div class="med-entry-text">${esc(e.text)}</div>
+      <button class="btn btn-r btn-sm" style="margin-top:6px;font-size:.72rem" onclick="deleteMedEntry('${type}','${e.id}')">🗑 Delete</button>
+    </div>`).join('')
+  :'<div style="color:var(--t3);font-size:.84rem;padding:10px 0">No entries yet.</div>';
+}
+
+async function saveMedEntry(type){
+  const inputId={diagnosis:'diag-input',prescription:'presc-input',lab:'lab-input',labresult:'labresult-input',notes:'notes-input'}[type];
+  const text=g(inputId)?.value.trim(); if(!text) return toast('Enter text first','e');
+  try{
+    await db.collection('store').doc(STORE_ID).collection('customers').doc(CURRENT_CUST_ID).collection(type).add({
+      text, by:ME.name||'Admin', date:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    g(inputId).value='';
+    toast('Saved!','s');
+    await loadMedEntries(CURRENT_CUST_ID);
+    renderMedEntries(type);
+  }catch(e){ toast('Failed: '+e.message,'e'); }
+}
+
+async function deleteMedEntry(type,entryId){
+  if(!confirm('Delete this entry?')) return;
+  try{
+    await db.collection('store').doc(STORE_ID).collection('customers').doc(CURRENT_CUST_ID).collection(type).doc(entryId).delete();
+    toast('Deleted','s');
+    await loadMedEntries(CURRENT_CUST_ID);
+    renderMedEntries(type);
+  }catch(e){ toast('Failed: '+e.message,'e'); }
+}
+
+function renderTimeline(custId){
+  const cache=MED_CACHE[custId]||{};
+  const tagMap={vitals:{label:'VITALS',cls:'tl-tag-vitals'},diagnosis:{label:'DIAGNOSIS',cls:'tl-tag-diagnosis'},prescription:{label:'PRESCRIPTION',cls:'tl-tag-prescription'},lab:{label:'LAB REQUEST',cls:'tl-tag-lab'},labresult:{label:'LAB RESULT',cls:'tl-tag-labresult'},notes:{label:'NOTE',cls:'tl-tag-notes'}};
+  let all=[];
+  // Add vitals
+  (VITALS_CACHE[custId]||[]).forEach(v=>all.push({type:'vitals',date:v.date,by:v.by||'Admin',text:`BP: ${v.bp||'—'} | Temp: ${v.temp||'—'}°C | Pulse: ${v.pulse||'—'} bpm | Weight: ${v.weight||'—'}kg | Ht: ${v.height||'—'}cm${v.spo2?' | SpO₂: '+v.spo2+'%':''}${v.other?' | '+v.other:''}`}));
+  ['diagnosis','prescription','lab','labresult','notes'].forEach(t=>{
+    (cache[t]||[]).forEach(e=>all.push({type:t,date:e.date,by:e.by||'Admin',text:e.text}));
+  });
+  all.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const el=g('medical-timeline'); if(!el) return;
+  el.innerHTML=all.length?all.map((e,i)=>{
+    const tag=tagMap[e.type]||{label:e.type,cls:'tl-tag-notes'};
+    return `<div class="tl-item"><div><div class="tl-dot"></div>${i<all.length-1?'<div class="tl-line"></div>':'' }</div><div class="tl-body"><span class="tl-tag ${tag.cls}">${tag.label}</span><div class="tl-meta">${esc(e.by)} · ${fmtDT(e.date)}</div><div class="tl-text">${esc(e.text)}</div></div></div>`;
+  }).join('')
+  :'<div style="color:var(--t3);font-size:.84rem;padding:10px 0">No medical records yet. Start by adding vital signs.</div>';
 }
 
 // ── VITAL SIGNS ───────────────────────────────────
@@ -1270,7 +1447,7 @@ function renderVitals(custId){
       ${vsCard('🍬','Blood Sugar',latest.sugar?latest.sugar+' mg/dL':'—','',sugarStatus(latest.sugar))}
       ${vsCard('💓','Pulse',latest.pulse?latest.pulse+' bpm':'—','',pulseStatus(latest.pulse))}
       ${vsCard('⚖️','Weight',latest.weight?latest.weight+' kg':'—','','')}
-      ${bmi?vsCard('📊','BMI',bmi.value,'',bmi.status):''}
+      ${bmi?vsCard('📊','BMI',bmi.value,'',bmi.status):''}${vsCard('🩺','SpO₂',latest.spo2?latest.spo2+'%':'—','','')}
     `;
   } else {
     lg.innerHTML='<div style="color:var(--t3);font-size:.84rem;grid-column:1/-1;padding:10px 0">No vital signs recorded yet.</div>';
@@ -1285,8 +1462,9 @@ function renderVitals(custId){
       <td class="td-m">${v.bp||'—'}</td>
       <td class="td-m">${v.sugar?v.sugar+' mg':'—'}</td>
       <td class="td-m">${v.pulse?v.pulse+' bpm':'—'}</td>
-      <td class="td-m">${v.weight?v.weight+' kg':'—'}${bmi?' ('+bmi.value+')':''}</td>
-      <td style="font-size:.78rem;max-width:130px;overflow:hidden;text-overflow:ellipsis">${esc(v.other||'—')}</td>
+      <td class="td-m">${v.weight?v.weight+' kg':'—'}${bmi?' (BMI:'+bmi.value+')':''}${v.height?' / '+v.height+'cm':''}</td>
+      <td class="td-m">${v.spo2?v.spo2+'%':'—'}</td>
+      <td style="font-size:.78rem;max-width:100px;overflow:hidden;text-overflow:ellipsis">${esc(v.other||'—')}</td>
       <td><button class="btn btn-r btn-sm" style="font-size:.72rem" onclick="deleteVital('${custId}','${v.id}')">🗑</button></td>
     </tr>`;
   }).join(''):'<tr><td colspan="8" style="text-align:center;padding:22px;color:var(--t3)">No records yet</td></tr>';
@@ -1328,7 +1506,7 @@ function openVitalModal(){
   g('vm-err').classList.add('h'); g('vm-id').value='';
   const now=new Date(); now.setMinutes(now.getMinutes()-now.getTimezoneOffset());
   g('vm-date').value=now.toISOString().slice(0,16);
-  ['vm-temp','vm-bp','vm-sugar','vm-pulse','vm-weight','vm-height','vm-other'].forEach(f=>g(f).value='');
+  ['vm-temp','vm-bp','vm-sugar','vm-pulse','vm-weight','vm-height','vm-spo2','vm-other'].forEach(f=>g(f).value='');
   g('vm-bmi-display').classList.add('h');
   g('vm-t').textContent='Add Vital Signs';
   g('vm-height').oninput=g('vm-weight').oninput=calcBMILive;
@@ -1354,8 +1532,9 @@ async function saveVital(){
     pulse:parseFloat(g('vm-pulse').value)||null,
     weight:parseFloat(g('vm-weight').value)||null,
     height:parseFloat(g('vm-height').value)||null,
+    spo2:parseFloat(g('vm-spo2').value)||null,
     other:g('vm-other').value.trim()||null,
-    recordedBy:ME.name||'Staff',
+    by:ME.name||'Admin',
     createdAt:firebase.firestore.FieldValue.serverTimestamp()
   };
   // Remove nulls
