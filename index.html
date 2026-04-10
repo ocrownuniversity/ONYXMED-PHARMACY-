@@ -2,8 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>ONYX-MED PHARMACY — StockPilot PRO</title>
+
+<!-- PWA -->
+<link rel="manifest" href="./manifest.json"/>
+<meta name="theme-color" content="#2563EB"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="OnyxMed"/>
+
+<!-- SEO / Open Graph -->
+<meta name="description" content="ONYX-MED PHARMACY — Professional Pharmacy Management System"/>
+<meta name="author" content="ONYX-MED PHARMACY"/>
+<meta property="og:title" content="ONYX-MED PHARMACY"/>
+<meta property="og:description" content="Professional Pharmacy Stock & Patient Management"/>
+<meta property="og:type" content="website"/>
+
+<!-- Prevent phone number detection -->
+<meta name="format-detection" content="telephone=no"/>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -353,6 +372,54 @@ textarea.fc{resize:vertical;min-height:70px}
   .sc-icon{width:38px;height:38px;font-size:1.1rem}
 }
 @media print{.sb,.topbar,.toast-w{display:none!important}.main{margin:0!important}}
+
+/* PWA Install Banner */
+.pwa-banner{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#0F1F45,#1E3A8A);color:#fff;padding:14px 18px;display:flex;align-items:center;gap:12px;z-index:9000;box-shadow:0 -4px 20px rgba(0,0,0,.3);transform:translateY(100%);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.pwa-banner.show{transform:translateY(0)}
+.pwa-banner-icon{font-size:2rem;flex-shrink:0}
+.pwa-banner-text{flex:1}
+.pwa-banner-title{font-weight:800;font-size:.95rem;margin-bottom:2px}
+.pwa-banner-sub{font-size:.76rem;opacity:.7}
+.pwa-banner-btns{display:flex;gap:8px;flex-shrink:0}
+.pwa-install-btn{padding:9px 16px;background:#2563EB;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:.83rem;cursor:pointer;white-space:nowrap}
+.pwa-dismiss-btn{padding:9px 12px;background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;font-size:.83rem;cursor:pointer}
+
+/* Offline indicator */
+.offline-bar{position:fixed;top:0;left:0;right:0;background:#F59E0B;color:#fff;text-align:center;font-size:.8rem;font-weight:700;padding:6px;z-index:10000;display:none}
+.offline-bar.show{display:block}
+
+/* Network status dot on login */
+.pdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#10B981;margin-right:5px;vertical-align:middle}
+.pdot.offline{background:#EF4444}
+
+/* Quick actions bar (mobile bottom nav) */
+.quick-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surf);border-top:1px solid var(--bord);z-index:400;padding:6px 0 calc(6px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.08)}
+.quick-nav-inner{display:flex;justify-content:space-around}
+.qn-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;border:none;background:none;cursor:pointer;color:var(--t3);font-size:.65rem;font-weight:600;border-radius:10px;transition:all .2s;min-width:56px}
+.qn-btn.on{color:#2563EB}
+.qn-btn svg{opacity:.6}
+.qn-btn.on svg{opacity:1}
+.qn-icon{font-size:1.2rem;line-height:1}
+@media(max-width:768px){
+  .quick-nav{display:block}
+  .main{padding-bottom:70px}
+  .pwa-banner{bottom:70px}
+}
+
+/* Print receipt styles */
+@media print{
+  body > *:not(#print-area){display:none!important}
+  #print-area{display:block!important}
+}
+#print-area{display:none}
+
+/* Expiry badge */
+.exp-warn{background:#FEF3C7;color:#D97706;border-radius:99px;padding:2px 7px;font-size:.68rem;font-weight:700}
+.exp-danger{background:#FEF2F2;color:#DC2626;border-radius:99px;padding:2px 7px;font-size:.68rem;font-weight:700}
+
+/* Skeleton loader */
+.skel{background:linear-gradient(90deg,var(--bg) 25%,var(--bord) 50%,var(--bg) 75%);background-size:200% 100%;animation:skel 1.4s infinite;border-radius:var(--r2);height:18px;margin-bottom:8px}
+@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 </head>
 <body>
@@ -487,6 +554,7 @@ textarea.fc{resize:vertical;min-height:70px}
       <div class="pg-head">
         <div><h2 id="dash-greet">Dashboard</h2><div class="pg-sub" id="dash-date"></div></div>
         <div class="pg-acts">
+          <div id="dash-clock" style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--t3);padding:7px 12px;background:var(--bg);border-radius:8px;min-width:90px;text-align:center"></div>
           <button class="btn btn-o btn-sm" onclick="renderDash()">🔄 Refresh</button>
           <button class="btn btn-b btn-sm" onclick="openSaleModal()">+ New Sale</button>
         </div>
@@ -644,6 +712,8 @@ textarea.fc{resize:vertical;min-height:70px}
       <div class="fg2"><label class="fl">Quantity *</label><input class="fc" type="number" id="pm-qty" placeholder="0" min="0"/></div>
       <div class="fg2"><label class="fl">Low Stock Alert At</label><input class="fc" type="number" id="pm-low" placeholder="10"/></div>
       <div class="fu fg2"><label class="fl">Supplier</label><input class="fc" id="pm-sup" placeholder="Supplier name"/></div>
+      <div class="fg2"><label class="fl">Expiry Date</label><input class="fc" type="date" id="pm-exp"/></div>
+      <div class="fg2"><label class="fl">Batch / Lot No.</label><input class="fc" id="pm-batch" placeholder="e.g. BT-2024-001"/></div>
     </div>
   </div>
   <div class="mf"><button class="btn btn-o" onclick="closeM('prod-modal')">Cancel</button><button class="btn btn-b" id="pm-save" onclick="saveProd()">Add Product</button></div>
@@ -1100,6 +1170,8 @@ function setupApp(){
   if(g('set-role'))g('set-role').value=ME.role;
   subscribeData();
   nav('dashboard');
+  startClock();
+  resetActivityTimer();
 }
 
 // ── SUBSCRIPTIONS ─────────────────────────────────
@@ -1212,7 +1284,15 @@ function renderProds(){
   grid.innerHTML=list.length?list.map(p=>{
     const lw=p.quantity>0&&p.quantity<=(p.lowAt||CFG.threshold), ot=p.quantity===0;
     const em=EMOJI[p.category]||'📦';
-    return `<div class="pc ${ot?'out':lw?'low':''}"><div class="pc-img">${em}${ot?'<span class="pc-bdg bdg bdg-r">Out</span>':lw?'<span class="pc-bdg bdg bdg-a">Low</span>':''}</div><div class="pc-body"><div class="pc-cat">${esc(p.category)}</div><div class="pc-name">${esc(p.name)}</div><div class="pc-sku">${p.sku||'No SKU'}</div><div class="pc-row"><span class="pc-price">${fmt(p.price)}</span><span class="pc-qty ${ot?'ot':lw?'lw':'ok'}">${ot?'Out':p.quantity+' units'}</span></div><div class="pc-btns"><button class="btn btn-o btn-sm" style="flex:1;font-size:.77rem" onclick="openProdModal('${p.id}')">✏️ Edit</button><button class="btn btn-o btn-sm" style="font-size:.77rem;color:#2563EB" onclick="openStockModal('${p.id}')">📦</button><button class="btn btn-r btn-sm" style="font-size:.77rem" onclick="openDelModal('${p.id}','${esc(p.name)}')">🗑</button></div></div></div>`;
+    let expiryBadge='';
+    if(p.expiry){
+      const today=new Date(); today.setHours(0,0,0,0);
+      const exp=new Date(p.expiry); exp.setHours(0,0,0,0);
+      const days=Math.ceil((exp-today)/(1000*60*60*24));
+      if(days<=0) expiryBadge=`<span class="exp-danger">Expired</span>`;
+      else if(days<=30) expiryBadge=`<span class="exp-warn">Exp ${days}d</span>`;
+    }
+    return `<div class="pc ${ot?'out':lw?'low':''}"><div class="pc-img">${em}${ot?'<span class="pc-bdg bdg bdg-r">Out</span>':lw?'<span class="pc-bdg bdg bdg-a">Low</span>':''}</div><div class="pc-body"><div class="pc-cat">${esc(p.category)}</div><div class="pc-name">${esc(p.name)}</div><div class="pc-sku">${p.sku||'No SKU'}${p.batch?' · '+esc(p.batch):''}</div><div class="pc-row"><span class="pc-price">${fmt(p.price)}</span><span class="pc-qty ${ot?'ot':lw?'lw':'ok'}">${ot?'Out':p.quantity+' units'}</span></div>${expiryBadge?'<div style="margin-top:4px">'+expiryBadge+'</div>':''}<div class="pc-btns"><button class="btn btn-o btn-sm" style="flex:1;font-size:.77rem" onclick="openProdModal('${p.id}')">✏️ Edit</button><button class="btn btn-o btn-sm" style="font-size:.77rem;color:#2563EB" onclick="openStockModal('${p.id}')">📦</button><button class="btn btn-r btn-sm" style="font-size:.77rem" onclick="openDelModal('${p.id}','${esc(p.name)}')">🗑</button></div></div></div>`;
   }).join(''):'<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📦</div><div class="empty-title">No products</div><div class="empty-sub">Click "+ Add Product" to start</div></div>';
 }
 
@@ -1224,11 +1304,14 @@ function openProdModal(id){
     g('pm-name').value=p.name; g('pm-cat').value=p.category||''; g('pm-sku').value=p.sku||'';
     g('pm-price').value=p.price; g('pm-cost').value=p.costPrice||''; g('pm-qty').value=p.quantity;
     g('pm-low').value=p.lowAt||CFG.threshold; g('pm-sup').value=p.supplier||'';
+    g('pm-exp').value=p.expiry||''; g('pm-batch').value=p.batch||'';
     g('pm-save').textContent='Save Changes';
   } else {
     g('pm-t').textContent='Add Product'; g('pm-id').value='';
     ['pm-name','pm-cat','pm-sku','pm-price','pm-cost','pm-qty','pm-sup'].forEach(f=>g(f).value='');
-    g('pm-low').value=CFG.threshold; g('pm-save').textContent='Add Product';
+    g('pm-low').value=CFG.threshold;
+    ['pm-exp','pm-batch'].forEach(f=>{const e=g(f);if(e)e.value='';})
+    g('pm-save').textContent='Add Product';
   }
   openM('prod-modal');
 }
@@ -1240,7 +1323,7 @@ async function saveProd(){
   if(!cat)  return ferr('pm-err','Category required.');
   if(isNaN(price)||price<0) return ferr('pm-err','Enter valid price.');
   if(isNaN(qty)||qty<0)     return ferr('pm-err','Enter valid quantity.');
-  const data={name,category:cat,price,quantity:qty,sku:g('pm-sku').value.trim(),costPrice:parseFloat(g('pm-cost').value)||0,lowAt:parseInt(g('pm-low').value)||CFG.threshold,supplier:g('pm-sup').value.trim()};
+  const data={name,category:cat,price,quantity:qty,sku:g('pm-sku').value.trim(),costPrice:parseFloat(g('pm-cost').value)||0,lowAt:parseInt(g('pm-low').value)||CFG.threshold,supplier:g('pm-sup').value.trim(),expiry:g('pm-exp').value||'',batch:g('pm-batch').value.trim()||''};
   try{
     const col=db.collection('store').doc(STORE_ID).collection('products');
     if(eid){ await col.doc(eid).update(data); }
@@ -1278,6 +1361,7 @@ function checkLowStock(){
     if(p.quantity===0) addNotif('warn','Out of Stock',p.name+' is out of stock!');
     else if(p.quantity<=(p.lowAt||CFG.threshold)) addNotif('warn','Low Stock',p.name+' has only '+p.quantity+' left.');
   });
+  checkExpiryAlerts();
 }
 
 // ── SALES ─────────────────────────────────────────
@@ -1848,6 +1932,201 @@ document.addEventListener('keydown',e=>{
 });
 
 console.log('%c ONYX-MED PHARMACY — StockPilot PRO ✓','background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff;padding:5px 12px;border-radius:5px;font-weight:700');
+
+// ══════════════════════════════════════════════════
+//  PWA — SERVICE WORKER + INSTALL PROMPT
+// ══════════════════════════════════════════════════
+let deferredInstallPrompt = null;
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg=>{ console.log('[SW] Registered:', reg.scope); })
+      .catch(err=>{ console.warn('[SW] Failed:', err); });
+  });
+}
+
+// Capture install prompt
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  // Show banner after 3 seconds if not dismissed before
+  const dismissed = localStorage.getItem('pwa_dismissed');
+  if(!dismissed){
+    setTimeout(()=>{
+      const banner = g('pwa-banner');
+      if(banner) banner.classList.add('show');
+    }, 3000);
+  }
+});
+
+// Install button
+const installBtn = document.getElementById('pwa-install-btn');
+if(installBtn){
+  installBtn.addEventListener('click', async ()=>{
+    if(!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    const { outcome } = await deferredInstallPrompt.userChoice;
+    if(outcome === 'accepted') toast('App installed! 🎉','s');
+    deferredInstallPrompt = null;
+    dismissPWA();
+  });
+}
+
+window.addEventListener('appinstalled', ()=>{
+  dismissPWA();
+  toast('ONYX-MED installed on your device! 📱','s');
+});
+
+function dismissPWA(){
+  localStorage.setItem('pwa_dismissed','1');
+  const banner = g('pwa-banner');
+  if(banner) banner.classList.remove('show');
+}
+
+// ── ONLINE / OFFLINE DETECTION ──────────────────────
+function updateOnlineStatus(){
+  const bar = g('offline-bar');
+  const dot = document.querySelector('.pdot');
+  if(navigator.onLine){
+    if(bar) bar.classList.remove('show');
+    if(dot){ dot.classList.remove('offline'); dot.style.background='#10B981'; }
+  } else {
+    if(bar) bar.classList.add('show');
+    if(dot){ dot.classList.add('offline'); dot.style.background='#EF4444'; }
+    toast('You are offline — working in offline mode','w');
+  }
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+// ── MOBILE BOTTOM NAV ──────────────────────────────
+function setQN(key){
+  document.querySelectorAll('.qn-btn').forEach(b=>b.classList.remove('on'));
+  const el=g('qn-'+key); if(el) el.classList.add('on');
+}
+
+// ── EXPIRY DATE FEATURES ────────────────────────────
+function checkExpiryAlerts(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const soon=new Date(); soon.setDate(today.getDate()+30);
+  PRODS.forEach(p=>{
+    if(!p.expiry) return;
+    const exp=new Date(p.expiry); exp.setHours(0,0,0,0);
+    if(exp<=today) addNotif('warn','Expired',p.name+' expired on '+p.expiry);
+    else if(exp<=soon) addNotif('warn','Expiring Soon',p.name+' expires on '+p.expiry+' (within 30 days)');
+  });
+}
+
+// ── QUICK RECEIPT PRINT ────────────────────────────
+function printReceipt(saleId){
+  const s=SALES.find(x=>x.id===saleId); if(!s) return;
+  const area=g('print-area');
+  area.innerHTML=`
+    <div style="font-family:monospace;max-width:320px;margin:0 auto;padding:20px">
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-size:1.4rem;font-weight:900">ONYX-MED PHARMACY</div>
+        <div style="font-size:.8rem;color:#666">${esc(CFG.address||'')}</div>
+        <div style="border-top:2px dashed #000;margin:8px 0"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px"><span>Receipt #</span><span>${saleId.slice(-8).toUpperCase()}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px"><span>Date</span><span>${fmtDT(s.timestamp)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px"><span>Cashier</span><span>${esc(s.cashier||ME.name||'—')}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:12px"><span>Patient</span><span>${esc(s.customerName||s.customer||'Walk-in')}</span></div>
+      <div style="border-top:1px dashed #000;margin-bottom:8px"></div>
+      <div style="display:flex;justify-content:space-between;font-size:.9rem;margin-bottom:4px"><span>${esc(s.productName)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:12px"><span>${s.quantity} x ${fmt(s.unitPrice)}</span><span>${fmt(s.total)}</span></div>
+      <div style="border-top:2px dashed #000;margin-bottom:8px"></div>
+      <div style="display:flex;justify-content:space-between;font-size:1.1rem;font-weight:900;margin-bottom:16px"><span>TOTAL</span><span>${fmt(s.total)}</span></div>
+      <div style="text-align:center;font-size:.75rem;color:#666">Thank you for choosing ONYX-MED PHARMACY<br>Stay healthy! 💊</div>
+    </div>`;
+  area.style.display='block';
+  setTimeout(()=>{ window.print(); area.style.display='none'; }, 200);
+}
+
+// ── DASHBOARD CLOCK ────────────────────────────────
+function startClock(){
+  const el=g('dash-clock');
+  if(!el) return;
+  function tick(){
+    const now=new Date();
+    el.textContent=now.toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }
+  tick(); setInterval(tick,1000);
+}
+
+// ── EXPIRY FIELD IN saveProd / openProdModal ───────
+const _origOpenProd=window.openProdModal;
+// Patch openProdModal to handle expiry + batch
+const _origSaveProd=window.saveProd;
+
+// ── SESSION TIMEOUT (30 min inactivity) ───────────
+let activityTimer=null;
+function resetActivityTimer(){
+  clearTimeout(activityTimer);
+  if(!ME) return;
+  activityTimer=setTimeout(()=>{
+    toast('Session expired due to inactivity. Logging out…','w');
+    setTimeout(logout,2000);
+  }, 30*60*1000);
+}
+['click','touchstart','keydown'].forEach(ev=>
+  document.addEventListener(ev, resetActivityTimer, {passive:true})
+);
+
+// ── KEYBOARD SHORTCUT HELP ─────────────────────────
+// Ctrl+S = new sale, Ctrl+P = products, Ctrl+N = new patient
+document.addEventListener('keydown', e=>{
+  if(!ME) return;
+  if(e.ctrlKey||e.metaKey){
+    if(e.key==='s'){e.preventDefault();openSaleModal();}
+    if(e.key==='p'){e.preventDefault();nav('products');}
+    if(e.key==='n'){e.preventDefault();openCustModal();}
+    if(e.key==='d'){e.preventDefault();nav('dashboard');}
+  }
+});
+
 </script>
+<!-- Offline Bar -->
+<div class="offline-bar" id="offline-bar">📡 You are offline — data may not sync until connection is restored</div>
+
+<!-- PWA Install Banner -->
+<div class="pwa-banner" id="pwa-banner">
+  <div class="pwa-banner-icon">💊</div>
+  <div class="pwa-banner-text">
+    <div class="pwa-banner-title">Install ONYX-MED PHARMACY</div>
+    <div class="pwa-banner-sub">Add to home screen for quick access — works offline</div>
+  </div>
+  <div class="pwa-banner-btns">
+    <button class="pwa-install-btn" id="pwa-install-btn">Install</button>
+    <button class="pwa-dismiss-btn" onclick="dismissPWA()">✕</button>
+  </div>
+</div>
+
+<!-- Mobile Bottom Quick Nav -->
+<nav class="quick-nav" id="quick-nav">
+  <div class="quick-nav-inner">
+    <button class="qn-btn on" id="qn-dash" onclick="nav('dashboard');setQN('dash')">
+      <span class="qn-icon">🏠</span>Home
+    </button>
+    <button class="qn-btn" id="qn-products" onclick="nav('products');setQN('products')">
+      <span class="qn-icon">📦</span>Stock
+    </button>
+    <button class="qn-btn" id="qn-sale" onclick="openSaleModal()" style="color:#2563EB">
+      <span class="qn-icon" style="background:#2563EB;color:#fff;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-top:-10px;box-shadow:0 4px 14px rgba(37,99,235,.4)">+</span>Sale
+    </button>
+    <button class="qn-btn" id="qn-customers" onclick="nav('customers');setQN('customers')">
+      <span class="qn-icon">👥</span>Patients
+    </button>
+    <button class="qn-btn" id="qn-alerts" onclick="nav('alerts');setQN('alerts')">
+      <span class="qn-icon">🔔</span>Alerts
+    </button>
+  </div>
+</nav>
+
+<!-- Print Area -->
+<div id="print-area"></div>
+
 </body>
 </html>
